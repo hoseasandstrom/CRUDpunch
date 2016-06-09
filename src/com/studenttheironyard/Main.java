@@ -13,7 +13,7 @@ public class Main {
     static HashMap<String, User> userMap = new HashMap<>();
     static ArrayList<Comment> comments = new ArrayList<>();
 
-    static final int LISTPARAMS = 10 ;
+    static final int LISTPARAMS = 2 ;
 
 
     public static void main(String[] args) {
@@ -31,15 +31,15 @@ public class Main {
                         offset = Integer.valueOf(offsetStr);
                     }
 
-                    ArrayList tempList = new ArrayList<>(comments.subList(offset, offset + LISTPARAMS));
+                    ArrayList Comment = new ArrayList<>(comments.subList(offset, offset + LISTPARAMS));
 
                     HashMap map = new HashMap();
-                    map.put("users", tempList);
+                    map.put("users", comments);
                     map.put("offsetNext", offset + LISTPARAMS);
                     map.put("offsetPrevious", offset - LISTPARAMS);
                     map.put("showPrevious" ,offset > LISTPARAMS);
                     map.put("showNext", offset + LISTPARAMS < comments.size());
-                    return new ModelAndView(map, "home.html");
+                    return new ModelAndView(map, "index.html");
                 },
                 new MustacheTemplateEngine()
         );
@@ -74,7 +74,7 @@ public class Main {
                     m.put("comment", parentCmnt);
                     m.put("isMe", parentCmnt != null && username != null && parentCmnt.author.equals(username));
 
-                    return new ModelAndView(m, "home.html");
+                    return new ModelAndView(m, "people.html");
                 },
                 new MustacheTemplateEngine()
         );

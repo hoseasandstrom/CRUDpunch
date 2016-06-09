@@ -7,12 +7,16 @@ public class Punch {
     String traditionalPunch;
     String donkeyPunch;
     String oneInchPunch;
+    String throatPunch;
+    String suckaPunch;
     String additionalComments;
 
-    public Punch(String traditionalPunch, String donkeyPunch, String oneInchPunch, String additionalComments) {
+    public Punch(String traditionalPunch, String donkeyPunch, String oneInchPunch, String throatPunch, String suckaPunch, String additionalComments) {
         this.traditionalPunch = traditionalPunch;
         this.donkeyPunch = donkeyPunch;
         this.oneInchPunch = oneInchPunch;
+        this.throatPunch = throatPunch;
+        this.suckaPunch = suckaPunch;
         this.additionalComments = additionalComments;
     }
 }
