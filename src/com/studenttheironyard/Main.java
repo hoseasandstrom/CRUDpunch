@@ -13,7 +13,7 @@ public class Main {
     static HashMap<String, User> userMap = new HashMap<>();
     static ArrayList<Comment> comments = new ArrayList<>();
 
-    static final int TOPFIVE = 5 ;
+    static final int LISTPARAMS = 10 ;
 
 
     public static void main(String[] args) {
@@ -22,6 +22,27 @@ public class Main {
         addTestUsers();
 
         Spark.init();
+        Spark.get(
+                "/",
+                (request, response) -> {
+                    int offset = 0;
+                    String offsetStr = request.queryParams("offset");
+                    if (offsetStr != null) {
+                        offset = Integer.valueOf(offsetStr);
+                    }
+
+                    ArrayList tempList = new ArrayList<>(comments.subList(offset, offset + LISTPARAMS));
+
+                    HashMap map = new HashMap();
+                    map.put("users", tempList);
+                    map.put("offsetNext", offset + LISTPARAMS);
+                    map.put("offsetPrevious", offset - LISTPARAMS);
+                    map.put("showPrevious" ,offset > LISTPARAMS);
+                    map.put("showNext", offset + LISTPARAMS < comments.size());
+                    return new ModelAndView(map, "home.html");
+                },
+                new MustacheTemplateEngine()
+        );
         Spark.get(
                 "/",
                 (request, response) -> {
