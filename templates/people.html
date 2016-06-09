@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Punch List</title>
+</head>
+<body>
+
+{{#username}}
+Hello, {{.}}!<br>
+<div align="right"style="border:3px black">
+<form action="/logout" method="post" style="display: inline-block;">
+    <button type="submit"><strong>Logout</strong></button>
+</form>
+    </div>
+
+<form action="/create-message" method="post">
+    <input type="text" name="message" placeholder="Write your message:">
+    <input type="hidden" name="replyId" value="{{replyId}}">
+    <button type="submit">Submit</button>
+</form>
+<br>
+{{/username}}
+{{^username}}
+<form action ="/login" method="post">
+    <input type="text" name="username" placeholder="Enter your name:"/>
+    <button type="submit">Login</button>
+
+</form>
+{{/username}}
+
+{{#message}}
+<h1>{{author}} : {{text}}</h1>
+{{#isMe}}
+<form action="/delete-message" method="post">
+    <input type="hidden" name="id" value="{{id}}">
+    <button type="submit">Delete Message</button>
+</form>
+{{/isMe}}
+{{/message}}
+
+{{#messages}}
+<a href="/?replyId={{id}}">{{author}}: {{text}}</a><br>
+{{/messages}}
+
+</body>
+</html>
