@@ -19,4 +19,40 @@ public class Punch {
         this.suckaPunch = suckaPunch;
         this.additionalComments = additionalComments;
     }
+
+    public String getTraditionalPunch() {
+        return traditionalPunch;
+    }
+
+    public String getDonkeyPunch() {
+        return donkeyPunch;
+    }
+
+    public String getOneInchPunch() {
+        return oneInchPunch;
+    }
+
+    public String getThroatPunch() {
+        return throatPunch;
+    }
+
+    public String getSuckaPunch() {
+        return suckaPunch;
+    }
+
+    public String getAdditionalComments() {
+        return additionalComments;
+    }
+
+    @Override
+    public String toString() {
+        return "Punch{" +
+                "traditionalPunch='" + traditionalPunch + '\'' +
+                ", donkeyPunch='" + donkeyPunch + '\'' +
+                ", oneInchPunch='" + oneInchPunch + '\'' +
+                ", throatPunch='" + throatPunch + '\'' +
+                ", suckaPunch='" + suckaPunch + '\'' +
+                ", additionalComments='" + additionalComments + '\'' +
+                '}';
+    }
 }

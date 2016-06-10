@@ -7,7 +7,9 @@
 <body>
 
 {{#username}}
-What's up, {{.}}!<br>
+What's up, {{.}}!
+<br>
+
 <div align="right"style="border:3px black">
 <form action="/logout" method="post" style="display: inline-block;">
     <button type="submit"><strong>Logout</strong></button>
@@ -31,8 +33,8 @@ What's up, {{.}}!<br>
 </form>
 {{/username}}
 
-{{#comment}}
-<h1>{{author}} : {{text}}</h1>
+{{#comments}}
+<h3>{{author}} : {{text}}</h3>
 {{#isMe}}
 <form action="/delete-comment" method="post">
     <input type="hidden" name="id" value="{{id}}">
@@ -41,7 +43,7 @@ What's up, {{.}}!<br>
 {{/isMe}}
 {{/comment}}
 
-{{#messages}}
+{{#comments}}
 <a href="/?replyId={{id}}">{{author}}: {{text}}</a><br>
 {{/comments}}
 

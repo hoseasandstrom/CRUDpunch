@@ -16,4 +16,30 @@ public class Comment {
         this.text = text;
         this.author = author;
     }
+
+    public int getReplyId() {
+        return replyId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "replyId=" + replyId +
+                ", id=" + id +
+                ", text='" + text + '\'' +
+                ", author='" + author + '\'' +
+                '}';
+    }
 }

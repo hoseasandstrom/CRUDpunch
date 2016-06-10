@@ -21,7 +21,20 @@ Create a Punch Account Today!
     <input type ="password" name="userpassword" placeholder="Enter your password:"/>
     <button type="submit"><strong>Login</strong></button>
 </form></div>
+Current Users:
+{{#users}}
 
+{{user}}<button type="button" onclick= <a href="/user?id={{id}}"></a>View Profile</button>
+<br>
+{{#showPrevious}}
+<button type="button" onclick= <a href="/?offset={{offsetPrevious}}">previous</a></button>
+{{/showPrevious}}
+&nbsp;
+{{#showNext}}
+<button type="button" onclick= <a href="/?offset={{offsetNext}}">next</a></button>
+{{/showNext}}
+
+{{/users}}
 
 
 
