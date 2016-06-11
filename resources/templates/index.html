@@ -6,10 +6,12 @@
 </head>
 <body>
 
-<h3>What up:{{name}}!</h3>
+What up: {{username}}
+
 <form action="/logout" method="post">
     <button type="submit">Logout</button>
 </form>
+
 
 <h3>Gets to Clobberin'</h3>
 
@@ -25,6 +27,8 @@
     <input type="text" name="punchcomment"placeholder="Why?"/>
     <button type="submit">Bring the Pain!</button>
 </form>
+<br>
+<h3>The PUNCH List:</h3>
 
 <ol>
     {{#punchlist}}
