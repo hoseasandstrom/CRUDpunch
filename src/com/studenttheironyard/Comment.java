@@ -4,42 +4,57 @@ package com.studenttheironyard;
  * Created by hoseasandstrom on 6/9/16.
  */
 public class Comment {
-    int replyId;
     int id;
-    String text;
+    int replyId;
     String author;
+    String text;
 
-
-    public Comment(int replyId, int id, String text, String author) {
-        this.replyId = replyId;
+    public Comment(int id, int replyId, String author, String text) {
         this.id = id;
-        this.text = text;
+        this.replyId = replyId;
         this.author = author;
-    }
-
-    public int getReplyId() {
-        return replyId;
+        this.text = text;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getText() {
-        return text;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getReplyId() {
+        return replyId;
+    }
+
+    public void setReplyId(int replyId) {
+        this.replyId = replyId;
     }
 
     public String getAuthor() {
         return author;
     }
 
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
     @Override
     public String toString() {
         return "Comment{" +
-                "replyId=" + replyId +
-                ", id=" + id +
-                ", text='" + text + '\'' +
+                "id=" + id +
+                ", replyId=" + replyId +
                 ", author='" + author + '\'' +
+                ", text='" + text + '\'' +
                 '}';
     }
 }

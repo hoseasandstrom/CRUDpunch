@@ -10,92 +10,57 @@ import java.util.HashMap;
 
 public class Main {
 
-    static HashMap<String, User> userMap = new HashMap<>();
-    static ArrayList<Comment> comments = new ArrayList<>();
+    static HashMap<String, User> users = new HashMap<>();
+    //static ArrayList<Comment> comments = new ArrayList<>();
+
 
     public static void main(String[] args) {
+        Spark.staticFileLocation("public");
         Spark.init();
+
         Spark.get(
-                "people.html",
+                "/",
                 (request, response) -> {
                     Session session = request.session();
                     String username = session.attribute("username");
 
-                    String idStr = request.queryParams("replyId");
-                    int replyId = -1;
-                    if (idStr != null) {
-                        replyId = Integer.valueOf(idStr);
-                    }
-
-                    ArrayList<Comment> subset = new ArrayList<>();
-                    for (Comment msg : comments) {
-                        if (msg.replyId == replyId) {
-                            subset.add(msg);
-                        }
-                    }
-
-                    Comment parentMsg = null;
-                    if (replyId >=0) { //could use try,catch
-                        parentMsg = comments.get(replyId);
-                    }
-
                     HashMap m = new HashMap();
-                    m.put("comments", subset);
-                    m.put("username", username);
-                    m.put("replyId", replyId);
-                    m.put("comment", parentMsg);
-                    m.put("isMe", parentMsg != null && username != null && parentMsg.author.equals(username));
 
-                    return new ModelAndView(m, "index.html");
+                    if (username == null) {
+                        return new ModelAndView(m, "login.html");
+                    } else {
+                        User user = users.get(username);
+                        m.put("punchlist", user.punchlist);
+
+                        return new ModelAndView(m, "index.html");
+                    }
                 },
-                new MustacheTemplateEngine()
+
+                    new MustacheTemplateEngine()
+
         );
+
         Spark.post(
                 "/login",
                 (request, response) -> {
-                    String username = request.queryParams("username");
-                    String password = request.queryParams("userpassword");
-
-                    User user = userMap.get(username);
-
-                    if (username == null || password == null) {
-                        throw new Exception("Name or Password not entered");
+                    String name = request.queryParams("username");
+                    String pass = request.queryParams("password");
+                    if (name == null || pass == null) {
+                        throw new Exception("Name or pass not sent");
                     }
+
+                    User user = users.get(name);
                     if (user == null) {
-                        user = new User(username, password);
-                        userMap.put(username, user);
-                    }
-                    else if (!password.equals(user.password)){
-                        throw new Exception("Invalid password");
+                        user = new User(name, pass);
+                        users.put(name, user);
+                    } else if (!pass.equals(user.name)) {
+                        throw new Exception("Wrong password");
                     }
 
                     Session session = request.session();
-                    session.attribute("username", username);
+                    session.attribute("username", name);
 
-                    response.redirect("people.html");
-                    return "";
-                }
-        );
-        Spark.post(
-                "/create-user",
-                (request, response) -> {
-                    String username = request.queryParams("username");
-                    String password = request.queryParams("userpassword");
-
-                    User user = userMap.get(username);
-                    if (user == null){
-                        user = new User(username,"");
-                        userMap.put(username, user);
-                    }
-                    if (password == null) {
-                        user = new User(password, "");
-                        userMap.put(password, user);
-
-                    }
-                    Session session = request.session();
-                    session.attribute("username", username);
-
-                    response.redirect("people.html");
+                    response.redirect("/");
                     return "";
                 }
         );
@@ -106,49 +71,36 @@ public class Main {
                     Session session = request.session();
                     session.invalidate();
                     response.redirect("/");
-                    return "";
+                    return "/";
                 }
         );
+
         Spark.post(
-                "/create-comment",
+                "/pick-punch",
                 (request, response) -> {
                     Session session = request.session();
                     String username = session.attribute("username");
+
                     if (username == null) {
-                        throw new Exception("Not logged in.");
+                        throw new Exception("Not logged in");
                     }
-                    int replyId = Integer.valueOf(request.queryParams("replyId"));
-                    String text = request.queryParams("message");
-                    Comment msg = new Comment(comments.size(), replyId, username, text);
-                    comments.add(msg);
+                    String punchname = request.queryParams("punchname");
+                    String punchstyle = request.queryParams("punchstyle");
+                    String punchcomment = request.queryParams("punchcomment");
+                    if (punchname == null ||  punchcomment == null) {
+                        throw new Exception("Invalid form fields");
+                    }
+                    User user = users.get(username);
+                    if (user == null) {
+                        throw new Exception("User does not exist");
+                    }
+                    Punch p = new Punch(punchname, punchstyle, punchcomment);
+                    user.punchlist.add(p);
 
-                    response.redirect(request.headers("Referer"));
+                    response.redirect("/");
                     return "";
 
                 }
         );
-        Spark.post(
-                "/delete-message",
-                (request, response) -> {
-                    int id = Integer.valueOf(request.queryParams("id"));
-
-                    Session session = request.session();
-                    String username = session.attribute("username");
-                    Comment userMsg = comments.get(id);
-                    if (!userMsg.author.equals(username)) {
-                        throw new Exception("You cannot delete this post");
-                    }
-
-                    comments.remove(id);
-                    int index = 0; //reset ids
-                    for (Comment msg : comments) {
-                        msg.id = index;
-                        index++;
-                    }
-                    response.redirect(request.headers("Referrer"));
-                    return "";
-                }
-        );
-
     }
 }
