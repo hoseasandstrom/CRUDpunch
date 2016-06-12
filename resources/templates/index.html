@@ -6,7 +6,7 @@
     <title>It's Clobberin' Time!</title>
 </head>
 <body>
-<center></center>
+<center>
 {{#user}}
 What up, {{name}}!<form action="/logout" method="post" style="display: inline-block;">
     <button type="submit">Logout</button>
@@ -27,6 +27,7 @@ What up, {{name}}!<form action="/logout" method="post" style="display: inline-bl
     <input type="text" name="punchcomment"placeholder="Why?"/>
     <button type="submit">Bring the Pain!</button>
 </form>
+</center>
 <br>
 <h3>The PUNCH List:</h3>
 
@@ -44,6 +45,6 @@ What up, {{name}}!<form action="/logout" method="post" style="display: inline-bl
     </li>
     {{/punchlist}}
 </ol>
-</center>
+
 </body>
 </html>
