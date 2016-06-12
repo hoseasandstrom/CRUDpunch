@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="theme.css">
     <meta charset="UTF-8">
     <title>It's Clobberin' Time!</title>
 </head>
 <body>
-
-<form action="/logout" method="post">
+<center></center>
+{{#user}}
+What up, {{name}}!<form action="/logout" method="post" style="display: inline-block;">
     <button type="submit">Logout</button>
 </form>
-{{#username}}
-What up, {{name}}!
 <br>
-{{/username}}
+{{/user}}
 
-<h3>Gets to Clobberin'</h3>
+<h2>Gets to Clobberin'</h2>
 
 <form action="/pick-punch" method="post">
     <input type="text" name="punchname" placeholder="Who u gonna put the smack down on?"/>
@@ -33,9 +33,17 @@ What up, {{name}}!
 <ol>
     {{#punchlist}}
     <li>
-        <strong>{{punchname}}</strong> - {{punchstyle}} - {{punchcomment}}
+        <strong>You have selected {{punchname}}</strong> to be taken out by a {{punchstyle}}. The reason - {{punchcomment}}
+        <form action="/edit-punch" type="post" style="display: inline-block;">
+            <input type="hidden" name="id"/>
+            <button type="submit">Modify Punch Post</button></form>
+
+        <form action="/delete-punch" method="post" style="display: inline-block;">
+            <input type="hidden" name="id"/>
+            <button type="submit">Get rid of the evidence.</button></form>
     </li>
     {{/punchlist}}
 </ol>
+</center>
 </body>
 </html>

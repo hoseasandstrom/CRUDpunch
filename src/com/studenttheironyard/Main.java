@@ -12,7 +12,6 @@ public class Main {
 
     static HashMap<String, User> users = new HashMap<>();
     static ArrayList<User> userList = new ArrayList<>();
-    static ArrayList<Comment> comments = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -32,7 +31,6 @@ public class Main {
                     } else {
                         User user = users.get(username);
                         m.put("punchlist", user.punchlist);
-                        m.put("username", userList);
                     }
 
                     return new ModelAndView(m, "index.html");
@@ -57,7 +55,8 @@ public class Main {
                         users.put(name, user);
                         userList.add(user);
                     } else if (!pass.equals(user.name)) {
-                        throw new Exception("Wrong password");
+                        response.redirect("/login");
+                        return "";
                     }
 
                     Session session = request.session();
@@ -67,35 +66,25 @@ public class Main {
                     return "";
                 }
         );
-
-        Spark.post(
-                "/logout",
-                (request, response) -> {
-                    Session session = request.session();
-                    session.invalidate();
-                    response.redirect("/");
-                    return "/";
-                }
-        );
-
         Spark.post(
                 "/pick-punch",
                 (request, response) -> {
                     Session session = request.session();
                     String username = session.attribute("username");
-
                     if (username == null) {
-                        throw new Exception("Not logged in");
+                        response.redirect("/login");
                     }
+
                     String punchname = request.queryParams("punchname");
                     String punchstyle = request.queryParams("punchstyle");
                     String punchcomment = request.queryParams("punchcomment");
-                    if (punchname == null ||  punchcomment == null) {
-                        throw new Exception("Invalid form fields");
+                    if (punchname == null) {
+                        throw new Exception("You have to choose something to punch!");
                     }
                     User user = users.get(username);
                     if (user == null) {
-                        throw new Exception("User does not exist");
+                        response.redirect("/login");
+                        return "";
                     }
                     Punch p = new Punch(punchname, punchstyle, punchcomment);
                     user.punchlist.add(p);
@@ -105,28 +94,80 @@ public class Main {
 
                 }
         );
-
+        Spark.post(
+                "/logout",
+                (request, response) -> {
+                    Session session = request.session();
+                    session.invalidate();
+                    response.redirect("/");
+                    return "/";
+                }
+        );
         Spark.post(
                 "/delete-punch",
                 (request, response) -> {
-                    int id = Integer.valueOf(request.queryParams("id"));
-
                     Session session = request.session();
                     String username = session.attribute("username");
-                    ArrayList<User> users = new ArrayList<>(),;
-                    if (!Punch.punchcomment.equals(username)) {
-                        throw new Exception("You cannot delete this post");
+                    if (username == null) {
+                        throw new Exception("Not logged in");
                     }
 
-                    comments.remove(id);
-                    int index = 0; //reset ids
-                    for (Comment msg : comments) {
-                        msg.id = index;
-                        index++;
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    User user = users.get(username);
+                    if (id <= 0 || id - 1 >= user.punchlist.size()) {
+                        throw new Exception("Invalid id");
                     }
+                    user.punchlist.remove(id - 1);
+
                     response.redirect("/");
                     return "";
                 }
         );
+
+        Spark.get(
+                "/edit-punch",
+                (request, response) -> {
+
+                    Session session = request.session();
+                    String username = session.attribute("username");
+
+                    User user = users.get(username);
+                    if(username == null) {
+                        throw new Exception("you must log in first");
+                    }
+                    int id = (Integer.valueOf(request.queryParams("id")));
+                    HashMap map = new HashMap();
+                    User users = userList.get(id);
+                    map.put("punchlist", users);
+
+                    return new ModelAndView(map, "index.html");
+                },
+                new MustacheTemplateEngine()
+        );
+        Spark.post(
+                "/update-punch",
+                (request, response) -> {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+
+                    String punchname = request.queryParams("newpunchname");
+                    String punchstyle = request.queryParams("newpunchstyle");
+                    String punchcomment = request.queryParams("newpunchcomment");
+                    if (punchname == null) {
+                        throw new Exception("You have to choose something to punch!");
+                    }
+                    User user = users.get(username);
+
+                    Punch p = new Punch(punchname, punchstyle, punchcomment);
+                    user.punchlist.add(p);
+
+                    response.redirect("/");
+                    return "";
+
+                }
+
+        );
+
     }
 }

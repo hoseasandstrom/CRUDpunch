@@ -23,6 +23,22 @@ public class User {
         return password;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public ArrayList<Punch> getPunchlist() {
+        return punchlist;
+    }
+
+    public void setPunchlist(ArrayList<Punch> punchlist) {
+        this.punchlist = punchlist;
+    }
+
     @Override
     public String toString() {
         return "User{" +

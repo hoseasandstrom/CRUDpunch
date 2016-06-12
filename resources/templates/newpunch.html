@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="theme.css">
+    <meta charset="UTF-8">
+    <title>Update Punch</title>
+</head>
+<body>
+<center>
+<h3>Make it happen.</h3>
+
+{{#punch}}
+
+<form action="/pick-punch" method="post">
+    <input type="text" name="punchname" placeholder="Who u gonna put the smack down on?"/>
+    <select name="punchstyle">
+        <option value="Donkey Punch">Donkey Punch</option>
+        <option value="Throat Punch">Throat Punch</option>
+        <option value="Sucka Punch">Sucka Punch</option>
+        <option value="One-Inch Punch">One-Inch Punch</option>
+    </select>
+    <input type="text" name="punchcomment"placeholder="Why?"/>
+    <button type="submit">Bring the Pain!</button>
+</form>
+
+{{/punch}}
+<br>
+</center>
+</body>
+</html>
