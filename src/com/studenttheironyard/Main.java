@@ -12,6 +12,7 @@ public class Main {
 
     static HashMap<String, User> users = new HashMap<>();
     static ArrayList<User> userList = new ArrayList<>();
+    static ArrayList<Comment> comments = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -32,9 +33,9 @@ public class Main {
                         User user = users.get(username);
                         m.put("punchlist", user.punchlist);
                         m.put("username", userList);
-
-                        return new ModelAndView(m, "index.html");
                     }
+
+                    return new ModelAndView(m, "index.html");
                 },
 
                     new MustacheTemplateEngine()
@@ -102,6 +103,29 @@ public class Main {
                     response.redirect("/");
                     return "";
 
+                }
+        );
+
+        Spark.post(
+                "/delete-punch",
+                (request, response) -> {
+                    int id = Integer.valueOf(request.queryParams("id"));
+
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    ArrayList<User> users = new ArrayList<>(),;
+                    if (!Punch.punchcomment.equals(username)) {
+                        throw new Exception("You cannot delete this post");
+                    }
+
+                    comments.remove(id);
+                    int index = 0; //reset ids
+                    for (Comment msg : comments) {
+                        msg.id = index;
+                        index++;
+                    }
+                    response.redirect("/");
+                    return "";
                 }
         );
     }
