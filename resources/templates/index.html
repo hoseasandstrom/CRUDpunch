@@ -6,15 +6,15 @@
 </head>
 <body>
 
-What up: {{username}}
-
 <form action="/logout" method="post">
     <button type="submit">Logout</button>
 </form>
-
+{{#username}}
+What up, {{name}}!
+<br>
+{{/username}}
 
 <h3>Gets to Clobberin'</h3>
-
 
 <form action="/pick-punch" method="post">
     <input type="text" name="punchname" placeholder="Who u gonna put the smack down on?"/>

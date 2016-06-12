@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Main {
 
     static HashMap<String, User> users = new HashMap<>();
-    //static ArrayList<Comment> comments = new ArrayList<>();
+    static ArrayList<User> userList = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -31,6 +31,7 @@ public class Main {
                     } else {
                         User user = users.get(username);
                         m.put("punchlist", user.punchlist);
+                        m.put("username", userList);
 
                         return new ModelAndView(m, "index.html");
                     }
@@ -53,6 +54,7 @@ public class Main {
                     if (user == null) {
                         user = new User(name, pass);
                         users.put(name, user);
+                        userList.add(user);
                     } else if (!pass.equals(user.name)) {
                         throw new Exception("Wrong password");
                     }
