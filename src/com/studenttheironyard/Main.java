@@ -24,6 +24,12 @@ public class Main {
                     Session session = request.session();
                     String username = session.attribute("username");
 
+                    String idStr = request.queryParams("replyId");
+                    int id = 0;
+                    if (idStr != null) {
+                        id = Integer.valueOf(idStr);
+                    }
+
                     HashMap m = new HashMap();
 
                     if (username == null) {
@@ -116,9 +122,8 @@ public class Main {
 
                     User user = users.get(username);
                     if (id <= 0 || id - 1 >= user.punchlist.size()) {
-                        throw new Exception("Invalid id");
                     }
-                    user.punchlist.remove(id - 1);
+                    user.punchlist.remove(id);
 
                     response.redirect("/");
                     return "";
@@ -141,7 +146,7 @@ public class Main {
                     User users = userList.get(id);
                     map.put("punchlist", users);
 
-                    return new ModelAndView(map, "index.html");
+                    return new ModelAndView(map, "newpunch.html");
                 },
                 new MustacheTemplateEngine()
         );
@@ -154,9 +159,7 @@ public class Main {
                     String punchname = request.queryParams("newpunchname");
                     String punchstyle = request.queryParams("newpunchstyle");
                     String punchcomment = request.queryParams("newpunchcomment");
-                    if (punchname == null) {
-                        throw new Exception("You have to choose something to punch!");
-                    }
+
                     User user = users.get(username);
 
                     Punch p = new Punch(punchname, punchstyle, punchcomment);

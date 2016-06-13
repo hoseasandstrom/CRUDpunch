@@ -32,7 +32,7 @@
 <ol>
     {{#punchlist}}
     <li>
-        <h4>You have selected <strong>{{punchname}}</strong> to be taken out by a <strong>{{punchstyle}}</strong>. The reason - <strong>{{punchcomment}}</strong></h4>
+        You have selected <strong>{{punchname}}</strong> to be taken out by a <strong>{{punchstyle}}</strong>. The reason - <strong>{{punchcomment}}</strong>
         <form action="/edit-punch" type="get" style="display: inline-block;">
             <input type="hidden" name="id" value="{{id}}"/>
             <button type="submit">Modify Punch Post</button></form>

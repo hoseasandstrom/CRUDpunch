@@ -9,21 +9,18 @@
 <center>
 <h3>Make it happen.</h3>
 
-{{#punch}}
-
-<form action="/pick-punch" method="post">
-    <input type="text" name="punchname" placeholder="Who u gonna put the smack down on?"/>
-    <select name="punchstyle">
+<form action="/update-punch" method="post">
+    <input type="text" name="newpunchname" placeholder="Who/What is getting punched?"/>
+    <select name="newpunchstyle">
         <option value="Donkey Punch">Donkey Punch</option>
         <option value="Throat Punch">Throat Punch</option>
         <option value="Sucka Punch">Sucka Punch</option>
         <option value="One-Inch Punch">One-Inch Punch</option>
     </select>
-    <input type="text" name="punchcomment"placeholder="Why?"/>
+    <input type="text" name="newpunchcomment"placeholder="Why?"/>
     <button type="submit">Bring the Pain!</button>
 </form>
 
-{{/punch}}
 <br>
 </center>
 </body>
