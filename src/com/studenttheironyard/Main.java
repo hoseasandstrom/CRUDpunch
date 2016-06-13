@@ -72,7 +72,7 @@ public class Main {
                     return "";
                 }
         );
-        Spark.post(
+        Spark.post( //entering punch criteria
                 "/pick-punch",
                 (request, response) -> {
                     Session session = request.session();
@@ -109,7 +109,7 @@ public class Main {
                     return "/";
                 }
         );
-        Spark.post(
+        Spark.post( //takes selected info and deletes it
                 "/delete-punch",
                 (request, response) -> {
                     Session session = request.session();
@@ -130,7 +130,7 @@ public class Main {
                 }
         );
 
-        Spark.get(
+        Spark.get( //redirect to  update-punch page to edit
                 "/edit-punch",
                 (request, response) -> {
 
@@ -150,7 +150,7 @@ public class Main {
                 },
                 new MustacheTemplateEngine()
         );
-        Spark.post(
+        Spark.post( //redirect to index.html with updated criteria
                 "/update-punch",
                 (request, response) -> {
                     Session session = request.session();
