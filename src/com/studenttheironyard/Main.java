@@ -36,7 +36,7 @@ public class Main {
                     return new ModelAndView(m, "index.html");
                 },
 
-                    new MustacheTemplateEngine()
+                new MustacheTemplateEngine()
 
         );
 
@@ -44,17 +44,17 @@ public class Main {
                 "/login",
                 (request, response) -> {
                     String name = request.queryParams("username");
-                    String pass = request.queryParams("password");
-                    if (name == null || pass == null) {
+                    String password = request.queryParams("password");
+                    if (name == null || password == null) {
                         throw new Exception("Name or pass not sent");
                     }
 
                     User user = users.get(name);
                     if (user == null) {
-                        user = new User(name, pass);
+                        user = new User(name, password);
                         users.put(name, user);
                         userList.add(user);
-                    } else if (!pass.equals(user.name)) {
+                    } else if (!password.equals(user.name)) {
                         response.redirect("/login");
                         return "";
                     }

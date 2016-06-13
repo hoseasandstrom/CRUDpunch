@@ -7,6 +7,7 @@ public class Punch {
     String punchname;
     String punchstyle;
     String punchcomment;
+    int id;
 
 
     public Punch(String punchname, String punchstyle, String punchcomment) {
@@ -39,5 +40,13 @@ public class Punch {
         this.punchcomment = punchcomment;
     }
 
+    @Override
+    public String toString() {
+        return "Punch{" +
+                "punchname='" + punchname + '\'' +
+                ", punchstyle='" + punchstyle + '\'' +
+                ", punchcomment='" + punchcomment + '\'' +
+                '}';
+    }
 }
 

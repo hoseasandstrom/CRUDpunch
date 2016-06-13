@@ -7,14 +7,12 @@
 </head>
 <body>
 <center>
-{{#user}}
-What up, {{name}}!<form action="/logout" method="post" style="display: inline-block;">
+<form action="/logout" method="post" style="display: inline-block;">
     <button type="submit">Logout</button>
 </form>
-<br>
-{{/user}}
+    <br>
 
-<h2>Gets to Clobberin'</h2>
+<h1>Gets to Clobberin'</h1>
 
 <form action="/pick-punch" method="post">
     <input type="text" name="punchname" placeholder="Who u gonna put the smack down on?"/>
@@ -29,18 +27,18 @@ What up, {{name}}!<form action="/logout" method="post" style="display: inline-bl
 </form>
 </center>
 <br>
-<h3>The PUNCH List:</h3>
+<h2>The PUNCH List:</h2>
 
 <ol>
     {{#punchlist}}
     <li>
-        <strong>You have selected {{punchname}}</strong> to be taken out by a {{punchstyle}}. The reason - {{punchcomment}}
-        <form action="/edit-punch" type="post" style="display: inline-block;">
-            <input type="hidden" name="id"/>
+        <h4>You have selected <strong>{{punchname}}</strong> to be taken out by a <strong>{{punchstyle}}</strong>. The reason - <strong>{{punchcomment}}</strong></h4>
+        <form action="/edit-punch" type="get" style="display: inline-block;">
+            <input type="hidden" name="id" value="{{id}}"/>
             <button type="submit">Modify Punch Post</button></form>
 
         <form action="/delete-punch" method="post" style="display: inline-block;">
-            <input type="hidden" name="id"/>
+            <input type="hidden" name="id" value="{{id}}"/>
             <button type="submit">Get rid of the evidence.</button></form>
     </li>
     {{/punchlist}}
