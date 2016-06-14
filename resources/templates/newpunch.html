@@ -10,6 +10,7 @@
 <h3>Make it happen.</h3>
 
 <form action="/update-punch" method="post">
+    <input type="hidden" name="id" value="{{id}}" />
     <input type="text" name="newpunchname" placeholder="Who/What is getting punched?"/>
     <select name="newpunchstyle">
         <option value="Donkey Punch">Donkey Punch</option>

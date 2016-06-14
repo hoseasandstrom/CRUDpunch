@@ -1,10 +1,12 @@
 package com.studenttheironyard;
 
+import org.h2.tools.Server;
 import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,8 +15,82 @@ public class Main {
     static HashMap<String, User> users = new HashMap<>();
     static ArrayList<User> userList = new ArrayList<>();
 
+    public static void createTables(Connection conn) throws SQLException {
+        Statement stmt = conn.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS users(id IDENTITY, name VARCHAR, password VARCHAR)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS punches(id IDENTITY, punchname VARCHAR, punchstyle VARCHAR, punchcomment VARCHAR, user_id INT)");
+    }
 
-    public static void main(String[] args) {
+    public static void insertUser(Connection conn, String name, String password) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO users VALUES(NULL, ?, ?)");
+        stmt.setString(1, name);
+        stmt.setString(2, password);
+        stmt.execute();
+    }
+
+    public static User selectUser(Connection conn, String name) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE name = ?");
+        stmt.setString(1, name);
+        ResultSet results = stmt.executeQuery();
+        if (results.next()){
+        int id = results.getInt("id");
+        String password = results.getString("password");
+        return new User(name, password);
+        }
+        return null;
+    }
+
+    public static void insertPunch(Connection conn, String punchname, String punchstyle, String punchcomment, int  userId) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO punches VALUES(NULL, ?, ?, ?, ?)");
+        stmt.setString(1, punchname);
+        stmt.setString(2, punchstyle);
+        stmt.setString(3, punchcomment);
+        stmt.setInt(4, userId);
+        stmt.execute();
+    }
+
+    public static Punch selectPunch(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id WHERE users.id = ?");
+        stmt.setInt(1, id);
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String punchname = results.getString("punches.punchname");
+            String punchstyle = results.getString("punches.punchstyle");
+            String punchcomment = results.getString("punches.punchcomment");
+            String author = results.getString("users.name");
+            return new Punch(id, punchname, punchstyle, punchcomment, author);
+        }
+        return null;
+    }
+
+    public static ArrayList<Punch> selectPunches(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id");
+        ResultSet results = stmt.executeQuery();
+        ArrayList<Punch> pnchs = new ArrayList<>();
+        while (results.next()) {
+            String punchname = results.getString("punches.punchname");
+            String punchstyle = results.getString("punches.punchstyle");
+            String punchcomment = results.getString("punches.punchcomment");
+            String author = results.getString("users.name");
+            Punch pnch = new Punch(id, punchname, punchstyle, punchcomment, author);
+        }
+        return null;
+    }
+
+    public static void deletePunch(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM punches WHERE id = ?");
+        stmt.setInt(1, id);
+        stmt.execute();
+    }
+
+
+
+
+    public static void main(String[] args) throws SQLException {
+        Server.createWebServer().start();
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+
         Spark.staticFileLocation("public");
         Spark.init();
 
@@ -24,22 +100,19 @@ public class Main {
                     Session session = request.session();
                     String username = session.attribute("username");
 
-                    String idStr = request.queryParams("replyId");
+                    String idStr = request.queryParams("id");
                     int id = 0;
                     if (idStr != null) {
                         id = Integer.valueOf(idStr);
                     }
 
-                    HashMap m = new HashMap();
+                    ArrayList<Punch> punches = selectPunches(conn, id);
 
                     if (username == null) {
-                        return new ModelAndView(m, "login.html");
-                    } else {
-                        User user = users.get(username);
-                        m.put("punchlist", user.punchlist);
+                        return new ModelAndView(conn, "login.html");
                     }
 
-                    return new ModelAndView(m, "index.html");
+                    return new ModelAndView(conn, "index.html");
                 },
 
                 new MustacheTemplateEngine()
@@ -51,18 +124,11 @@ public class Main {
                 (request, response) -> {
                     String name = request.queryParams("username");
                     String password = request.queryParams("password");
-                    if (name == null || password == null) {
-                        throw new Exception("Name or pass not sent");
-                    }
 
-                    User user = users.get(name);
+
+                    User user = selectUser(conn, name);
                     if (user == null) {
-                        user = new User(name, password);
-                        users.put(name, user);
-                        userList.add(user);
-                    } else if (!password.equals(user.name)) {
-                        response.redirect("/login");
-                        return "";
+                        insertUser(conn, name, "");
                     }
 
                     Session session = request.session();
@@ -87,13 +153,8 @@ public class Main {
                     if (punchname == null) {
                         throw new Exception("You have to choose something to punch!");
                     }
-                    User user = users.get(username);
-                    if (user == null) {
-                        response.redirect("/login");
-                        return "";
-                    }
-                    Punch p = new Punch(punchname, punchstyle, punchcomment);
-                    user.punchlist.add(p);
+                    User user = selectUser(conn, username);
+                    insertPunch(conn, punchname, punchstyle, punchcomment, user.id);
 
                     response.redirect("/");
                     return "";
@@ -112,18 +173,16 @@ public class Main {
         Spark.post( //takes selected info and deletes it
                 "/delete-punch",
                 (request, response) -> {
-                    Session session = request.session();
-                    String username = session.attribute("username");
-                    if (username == null) {
-                        throw new Exception("Not logged in");
-                    }
-
                     int id = Integer.valueOf(request.queryParams("id"));
 
-                    User user = users.get(username);
-                    if (id <= 0 || id - 1 >= user.punchlist.size()) {
+                    Session session = request.session();
+                    String username = session.attribute("username");
+                    Punch userPunch = selectPunch(conn, 1);
+                    if (!userPunch.author.equals(username)) {
+                        throw new Exception("You cannot delete this!");
                     }
-                    user.punchlist.remove(id);
+
+                    deletePunch(conn, id);
 
                     response.redirect("/");
                     return "";
@@ -156,14 +215,11 @@ public class Main {
                     Session session = request.session();
                     String username = session.attribute("username");
 
-                    String punchname = request.queryParams("newpunchname");
-                    String punchstyle = request.queryParams("newpunchstyle");
-                    String punchcomment = request.queryParams("newpunchcomment");
+                    String newpunchname = request.queryParams("newpunchname");
+                    String newpunchstyle = request.queryParams("newpunchstyle");
+                    String newpunchcomment = request.queryParams("newpunchcomment");
 
                     User user = users.get(username);
-
-                    Punch p = new Punch(punchname, punchstyle, punchcomment);
-                    user.punchlist.add(p);
 
                     response.redirect("/");
                     return "";
