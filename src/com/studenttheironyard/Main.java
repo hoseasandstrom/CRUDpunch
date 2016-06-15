@@ -12,13 +12,10 @@ import java.util.HashMap;
 
 public class Main {
 
-    static HashMap<String, User> users = new HashMap<>();
-    static ArrayList<User> userList = new ArrayList<>();
-
     public static void createTables(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
-        stmt.execute("CREATE TABLE IF NOT EXISTS users(id IDENTITY, name VARCHAR, password VARCHAR)");
-        stmt.execute("CREATE TABLE IF NOT EXISTS punches(id IDENTITY, punchname VARCHAR, punchstyle VARCHAR, punchcomment VARCHAR, user_id INT)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS users(userid IDENTITY, name VARCHAR, password VARCHAR)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS punches(punchid IDENTITY, punchname VARCHAR, punchstyle VARCHAR, punchcomment VARCHAR, user_id INT)");
     }
 
     public static void insertUser(Connection conn, String name, String password) throws SQLException {
@@ -49,21 +46,21 @@ public class Main {
         stmt.execute();
     }
 
-    public static Punch selectPunch(Connection conn, int id) throws SQLException {
+    public static Punch selectPunch(Connection conn, int userid) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id WHERE users.id = ?");
-        stmt.setInt(1, id);
+        stmt.setInt(1, userid);
         ResultSet results = stmt.executeQuery();
         if (results.next()) {
             String punchname = results.getString("punches.punchname");
             String punchstyle = results.getString("punches.punchstyle");
             String punchcomment = results.getString("punches.punchcomment");
             String author = results.getString("users.name");
-            return new Punch(id, punchname, punchstyle, punchcomment, author);
+            return new Punch(userid, punchname, punchstyle, punchcomment, author);
         }
         return null;
     }
 
-    public static ArrayList<Punch> selectPunches(Connection conn, int id) throws SQLException {
+    public static ArrayList<Punch> selectPunches(Connection conn, int userid) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id");
         ResultSet results = stmt.executeQuery();
         ArrayList<Punch> pnchs = new ArrayList<>();
@@ -72,16 +69,35 @@ public class Main {
             String punchstyle = results.getString("punches.punchstyle");
             String punchcomment = results.getString("punches.punchcomment");
             String author = results.getString("users.name");
-            Punch pnch = new Punch(id, punchname, punchstyle, punchcomment, author);
+            Punch pnch = new Punch(userid, punchname, punchstyle, punchcomment, author);
         }
         return null;
     }
 
-    public static void deletePunch(Connection conn, int id) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM punches WHERE id = ?");
-        stmt.setInt(1, id);
+    public static void deletePunch(Connection conn, int punchid) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM punches WHERE id = users.id");
+        stmt.setInt(1, punchid);
         stmt.execute();
     }
+    public static void editPunch(Connection conn, int punchid) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT FROM * punches WHERE id = user.id");
+        stmt.setInt(1, punchid);
+        stmt.execute();
+
+    }
+    public static void updatePunch(Connection conn, int userid) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("UPDATE FROM punches WHERE id = ?");
+        ResultSet results = stmt.executeQuery();
+        ArrayList<Punch> punches = new ArrayList<>();
+        while (results.next()) {
+            String newpunchname = results.getString("newpunchname");
+            String newpunchstyle = results.getString("newpunchstyle");
+            String newpunchcomment = results.getString("newpunchcomment");
+            String author = results.getString("users.name");
+            Punch pnch = new Punch(userid, newpunchname, newpunchstyle, newpunchcomment, author);
+        }
+    }
+
 
 
 
@@ -192,20 +208,14 @@ public class Main {
         Spark.get( //redirect to  update-punch page to edit
                 "/edit-punch",
                 (request, response) -> {
+                    int id = Integer.valueOf(request.queryParams("id"));
 
                     Session session = request.session();
                     String username = session.attribute("username");
 
-                    User user = users.get(username);
-                    if(username == null) {
-                        throw new Exception("you must log in first");
-                    }
-                    int id = (Integer.valueOf(request.queryParams("id")));
-                    HashMap map = new HashMap();
-                    User users = userList.get(id);
-                    map.put("punchlist", users);
+                    User user = selectUser(conn, username);
 
-                    return new ModelAndView(map, "newpunch.html");
+                    return new ModelAndView(conn, "newpunch.html");
                 },
                 new MustacheTemplateEngine()
         );
@@ -219,7 +229,8 @@ public class Main {
                     String newpunchstyle = request.queryParams("newpunchstyle");
                     String newpunchcomment = request.queryParams("newpunchcomment");
 
-                    User user = users.get(username);
+                    User user = selectUser(conn, username);
+
 
                     response.redirect("/");
                     return "";
