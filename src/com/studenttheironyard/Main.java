@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 public class Main {
 
+
     public static void createTables(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
         stmt.execute("CREATE TABLE IF NOT EXISTS users(userid IDENTITY, name VARCHAR, password VARCHAR)");
@@ -47,7 +48,7 @@ public class Main {
     }
 
     public static Punch selectPunch(Connection conn, int userid) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id WHERE users.id = ?");
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.userid = users.id WHERE users.id = ?");
         stmt.setInt(1, userid);
         ResultSet results = stmt.executeQuery();
         if (results.next()) {
@@ -61,7 +62,7 @@ public class Main {
     }
 
     public static ArrayList<Punch> selectPunches(Connection conn, int userid) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches INNER JOIN users ON punches.user_id = users.id");
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM punches");
         ResultSet results = stmt.executeQuery();
         ArrayList<Punch> pnchs = new ArrayList<>();
         while (results.next()) {
@@ -86,7 +87,7 @@ public class Main {
 
     }
     public static void updatePunch(Connection conn, int userid) throws SQLException {
-        PreparedStatement stmt = conn.prepareStatement("UPDATE FROM punches WHERE id = ?");
+        PreparedStatement stmt = conn.prepareStatement("UPDATE FROM punches SET newpunchname = ?, newpunchstyle = ?, newpunchcomment = ?, id = ?");
         ResultSet results = stmt.executeQuery();
         ArrayList<Punch> punches = new ArrayList<>();
         while (results.next()) {
@@ -170,7 +171,7 @@ public class Main {
                         throw new Exception("You have to choose something to punch!");
                     }
                     User user = selectUser(conn, username);
-                    insertPunch(conn, punchname, punchstyle, punchcomment, user.id);
+                    insertPunch(conn, punchname, punchstyle, punchcomment, user.userid);
 
                     response.redirect("/");
                     return "";
